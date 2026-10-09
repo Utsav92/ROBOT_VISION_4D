@@ -20,8 +20,10 @@ plus the dataset terms published with it. Consequently:
 
 ## Source code
 
-No open-source licence has been chosen for the code in this repository yet. Until the author adds one, the default copyright
-rules apply (viewing and forking on GitHub is permitted by GitHub's terms; reuse beyond that needs the author's permission).
+The source code in this repository (Python, GLSL shaders, TouchDesigner scripts and tests) is licensed under the **MIT License**:
+see [LICENSE](LICENSE). The MIT licence covers the code only. It does **not** cover the CODa dataset, and it does **not** change the
+terms of the CODa-derived images and videos above, which remain **CC BY-NC-SA 4.0** (non-commercial, attribution, share-alike).
+A commercial product built from the code would still have to obtain its own sensor data; it could not reuse CODa or the media.
 
 ## Third-party components not redistributed here
 

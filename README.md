@@ -41,6 +41,11 @@ sequences other than 0, the remaining ~120 frames (download in progress/throttle
 - Median stereo-vs-LiDAR |dZ| is ~0.25-0.31 m per frame with ~22k comparable points (SGBM, these thresholds are only
   visualisation defaults, not sensor specs).
 
+## License
+
+Code: **MIT** ([LICENSE](LICENSE)). The CODa dataset and every image/video derived from it are **CC BY-NC-SA 4.0** (non-commercial):
+see [NOTICE.md](NOTICE.md) for attribution and what is not redistributed.
+
 ## Gallery
 
 ![Storyboard preview: one frame from each of the seven scenes](docs/images/storyboard_preview.png)
