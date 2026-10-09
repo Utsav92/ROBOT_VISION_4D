@@ -1,0 +1,72 @@
+# ROBOT VISION 4D configuration.
+# Every value marked (documented) comes from the CODa DATA_REPORT; everything else is a tunable default.
+
+dataset:
+  root: data/coda
+  sequence: 0
+  frame_start: null        # null = auto-select (longest run of consecutive annotated frames)
+  frame_count: 200
+  image_source: 2d_rect    # stereo-rectified pairs (documented)
+  lidar_source: 3d_comp    # 3d_comp = ego-compensated, 3d_raw = uncompensated
+  pose_source: dense_global  # falls back to "dense" (sequences 8, 14, 15 have no dense_global)
+
+calibration:
+  # Whether calib_os1_to_cam0 targets the UNRECTIFIED cam0 frame (so R_rect must be applied before P).
+  # This is an assumption until verified with preprocessing/calibration_overlay.py on real frames.
+  apply_rectification_rotation: true
+
+sync:
+  max_dt_s: 0.05           # reject cross-stream matches further apart than this
+  expected_rate_hz: 10     # documented nominal rate; inspect_dataset.py measures the real one
+
+stereo:
+  backend: sgbm            # sgbm | raft  (raft falls back to sgbm if unavailable)
+  num_disparities: 160     # multiple of 16
+  block_size: 5
+  min_depth_m: 0.5
+  max_depth_m: 40.0
+  disp12_max_diff: 1       # left-right consistency check -> acts as the confidence filter
+  uniqueness_ratio: 10
+  smooth: true
+  stride: 3                # pixel stride of exported point grid (1224x1024 / 3 -> ~139k points)
+  voxel_size_m: 0.0        # 0 disables voxel filtering
+  raft:
+    repo: third_party/RAFT-Stereo
+    checkpoint: models/raftstereo-middlebury.pth
+    iters: 32
+
+lidar:
+  min_range_m: 0.5
+  max_range_m: 80.0
+  column_stride: 2         # 1024 columns / 2 -> 128 x 512 = 65,536 points per frame
+  intensity_percentiles: [1, 99]
+
+depth_error:
+  # Initial VISUALIZATION thresholds, not verified sensor-accuracy specifications.
+  good_below_m: 0.20
+  large_above_m: 0.50
+  scale_with_depth: false  # true adds a stereo-geometry term k*Z^2/(fx*B) to both thresholds
+  disparity_sigma_px: 0.5  # only used when scale_with_depth is true
+  occlusion_window_px: 7
+  occlusion_tol_m: 0.30
+  occlusion_tol_rel: 0.03
+  epsilon_m: 0.05
+
+export:
+  out_root: output/processed
+  td_axes: true            # export in TouchDesigner axes (x right, y up, z toward viewer)
+
+touchdesigner:
+  render_width: 1920
+  render_height: 1080
+  fps: 30
+  background: [0.012, 0.016, 0.028]
+  lidar_color: "#FF7500"
+  box_color: "#24FF60"
+
+temporal:
+  moving_min_disp_m: 1.0     # an identified instance is "moving" if its world-frame centre travels this far in the window
+  history_layers: 8          # ghost layers drawn per frame (sampled across the history duration)
+  history_s: 3.0             # default history length, seconds (measured sensor time, not frame counts)
+  decay_exponent: 1.5        # alpha = (1 - age/history) ** decay
+  time_axis_m_per_s: 2.0     # ARTISTIC time-explosion displacement (not a measured position)

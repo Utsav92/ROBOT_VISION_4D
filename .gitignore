@@ -1,0 +1,24 @@
+# --- data: CODa is CC BY-NC-SA 4.0 (non-commercial), ~1 GB; re-download with preprocessing/fetch_coda_subset.py
+data/
+# --- generated: processed frames, videos (>100 MB files are rejected by GitHub; use a Release), screenshots, logs
+output/
+# --- third-party material not redistributed here
+_ref/
+touchdesigner/modules/
+touchdesigner/import_modules.py
+touchdesigner/tools/modules/
+touchdesigner/tools/import_modules.py
+touchdesigner/tools/mcp_webserver_base.tox
+# --- TouchDesigner / python / editor noise
+*.1.toe
+*.toe.bkp*
+Backup/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+*.log
+touchdesigner/tools/_shot_run.py
+# --- plugin state folders (not project content)
+.claude-flow/
+**/.claude-flow/

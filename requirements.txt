@@ -1,0 +1,13 @@
+numpy>=1.24
+scipy>=1.10
+opencv-python>=4.8
+PyYAML>=6.0
+requests>=2.31
+remotezip>=0.12
+tqdm>=4.66
+pytest>=7.4
+
+# Optional: higher-quality stereo (needs a CUDA GPU + RAFT-Stereo checkout and checkpoint)
+# torch>=2.1
+# Optional: live robot mode (ROS 2 environment, not pip-installable)
+# rclpy, sensor_msgs_py
