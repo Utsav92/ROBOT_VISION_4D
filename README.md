@@ -18,7 +18,7 @@ non-commercial). Built in Python (preprocessing) + TouchDesigner 2025.33230 (GPU
 | 7 Temporal 4D | **Done, rendered**: 8 world-space history layers aged by MEASURED timestamps. Mode 1 Motion Echo (only points inside instances that really move: 2 pedestrians of 31 in seq 0), 2 Point Trails (whole cloud), 6 Time Explosion (artistic time axis, labelled as not measured; live scan stays unshifted). Mode 4 = timeline scrubber; Mode 5 = timeline FREEZE + any trail mode. Mode 3 (skeleton) deliberately omitted: no pose estimator, nothing invented. Verified coherent from two very different cameras |
 | 8 Cameras | **Done, rendered**: one driven render camera (`CAMERA_SYSTEM/main_camera`) fed by five pose generators selected with `camera_mode` 1-5 (robot POV at the sensor pose with the real camera's 77.0 deg fov / chase / free-fly / bird's-eye / cinematic orbit that hands over from the robot to each MOVING object on the data clock). Mode switches blend pose (slerp + lerp, smootherstep, `cam_blend_s`); measured chase to bird's-eye: monotone, no jump. Plus `WORLD_REFERENCE`: snapped fading ground grid and the robot trajectory. Deviation from the spec's four named camera COMPs: one driven camera, not four, so transitions are plain pose blends |
 | 9 UI, glow, render styles | **Done, rendered and click-tested**: `UI/panel` (dark 430x712 px container, openable as a window via `UI/control_window`): render style radio, 9 layer checkboxes, 4 view presets, temporal / camera radios, PLAY PAUSE REVERSE STEP- STEP+ RESET + FREEZE TIME, 13 sliders with value readouts. Widgets are the source of truth; `main_controls` channels bind to them by expression. **47/47 scripted widget checks pass** (`tools/ui_drive.py`, real `click(value, left=True)` through the callbacks). Glow + vignette + haze live in one GLSL TOP; SCIENTIFIC style bypasses all of it (post uniforms are exactly 0), CINEMATIC adds a soft-limited glow on bright saturated pixels only |
-| 10 Cinematic video | **Done, rendered, decoded and checked**: `output/videos/robot_vision_4d.mp4` (**45.000 s**, 1350 frames, 30 fps, H.264 yuv420p, **1280x720**, 8x MSAA, 236 MB at CRF 16) plus a lighter `_share.mp4` (113 MB); the spec's exact 30 s cut is kept as `_30s.mp4`. Seven scenes in the specified order and proportions (stretched 1.5x), rendered frame-by-frame and deterministically from `video_director.py` through the same panel widgets; encoded with ffmpeg/libx264 |
+| 10 Cinematic video | **Done, rendered, decoded and checked** (30 s cut published on the release; a 45 s cut also rendered locally): `output/videos/robot_vision_4d.mp4` (**45.000 s**, 1350 frames, 30 fps, H.264 yuv420p, **1280x720**, 8x MSAA, 236 MB at CRF 16) plus a lighter `_share.mp4` (113 MB); the spec's exact 30 s cut is kept as `_30s.mp4`. Seven scenes in the specified order and proportions (stretched 1.5x), rendered frame-by-frame and deterministically from `video_director.py` through the same panel widgets; encoded with ffmpeg/libx264 |
 | ROS 2 live mode (`optional_ros2/sensor_bridge.py`) | **Written; everything except the rclpy node is tested; the node itself has never run** (no ROS 2 / robot on this machine). Shares the exact per-frame code of the offline path (`preprocessing/frame_pipeline.py`, refactor verified bit-identical on real frames); decoding of PointCloud2/Image, pose composition, timestamp sync and the rolling export are unit-tested; `--selftest` replays real CODa frames through encode -> decode -> sync -> pipeline and matches the offline export (positions within 3.4e-5 m, depth-error values and colours exactly equal) |
 | 4K / 1080p export | **Not possible** under the non-commercial TouchDesigner licence (1280x720 cap) |
 | RAFT-Stereo | Wrapper written, **never run** (no CUDA GPU, no checkpoint). Falls back to SGBM |
@@ -44,14 +44,14 @@ sequences other than 0, the remaining ~120 frames (download in progress/throttle
 ## Gallery
 
 ![Storyboard preview: one frame from each of the seven scenes](docs/images/storyboard_preview.png)
-![Contact sheet from the encoded 45 s video](docs/images/video_contact_sheet.png)
+![Contact sheet of frames from the rendered video](docs/images/video_contact_sheet.png)
 ![Control panel](docs/images/ui_panel.png)
 ![Bird's-eye view](docs/images/cam4_bird.png)
 ![Cinematic render style](docs/images/style_cinematic.png)
 ![Motion echo from a side camera](docs/images/echo_f80_sidecam.png)
 
 All imagery is derived from the UT Austin Campus Object Dataset (CODa, CC BY-NC-SA 4.0): see [NOTICE.md](NOTICE.md).
-Videos (H.264, 1280x720, 30 fps) are attached to the GitHub release rather than stored in the repository.
+**Video:** the 30 s cinematic cut (H.264, 1280x720, 30 fps) is attached to the [v1.0 release](https://github.com/Utsav92/ROBOT_VISION_4D/releases/tag/v1.0) (`robot_vision_4d_30s.mp4`, 167 MB, or the lighter `_30s_share.mp4`, 82 MB) rather than stored in the repository. A longer 45 s cut can be re-rendered locally (see below); it is not published.
 
 ## Open the project (quick start)
 
@@ -118,10 +118,11 @@ drop the rest (it always works on the newest set); real time needs a GPU stereo 
 
 ## Cinematic video
 
-**Current: `output/videos/robot_vision_4d.mp4` - 45.000 s, 1350 frames, 30 fps, H.264 yuv420p, 1280x720, 8x MSAA, 236 MB
-(CRF 16); `robot_vision_4d_share.mp4` is a 113 MB copy (CRF 24).** The earlier 30 s cut (the spec's exact timing) is kept as
-`robot_vision_4d_30s.mp4` / `_30s_share.mp4`. The 45 s version is the spec's 30 s storyboard stretched by 1.5x
-(`video_director.SCALE`), so every scene keeps its proportions.
+**Published: the 30 s cut** (the brief's exact timing): 30.000 s, 900 frames, 30 fps, H.264 yuv420p, 1280x720, 8x MSAA - on the
+[v1.0 release](https://github.com/Utsav92/ROBOT_VISION_4D/releases/tag/v1.0) as `robot_vision_4d_30s.mp4` (167 MB, CRF 16) and
+`robot_vision_4d_30s_share.mp4` (82 MB, CRF 24). The project can also render a **45 s** cut (the same storyboard stretched by
+1.5x via `video_director.SCALE`; 236 MB), which was rendered and verified locally but is not published. The scene table below
+gives the 45 s times; for the 30 s cut divide by 1.5 (0-3, 3-6, 6-10, 10-14, 14-20, 20-26, 26-30 s).
 
 Re-render: `python touchdesigner/tools/export_video.py --full` (needs the TouchDesigner bridge up; ~11 min for 1350 frames,
 needs ~1.5 GB of free disk for the intermediate PNGs), or `--preview 45 120 240 ...` for single frames. Change
